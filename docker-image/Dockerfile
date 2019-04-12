@@ -9,3 +9,4 @@ RUN tlmgr install mdframed needspace sourcesanspro sourcecodepro ly1 mweights ti
 # Custom scripts
 ADD eisvogel.tex /root/.pandoc/templates/eisvogel.latex
 ADD md2pdf /usr/local/bin
+ADD convert-all-markdowns /usr/local/bin

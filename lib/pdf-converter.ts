@@ -1,7 +1,7 @@
 import cdk = require('@aws-cdk/cdk');
 import codebuild = require('@aws-cdk/aws-codebuild');
 import path = require('path');
-import ssm = require('@aws-cdk/aws-ssm');
+import iam = require('@aws-cdk/aws-iam');
 
 export interface PdfConverterProps {
   /**
@@ -34,7 +34,7 @@ export interface PdfConverterProps {
   /**
    * AWS SSM Parameter Store name where personal access token is stored
    *
-   * @default "/GitHub/$owner"
+   * @default "/GitHubToken/$owner"
    */
   personalAccessTokenParameterName?: string;
 
@@ -50,7 +50,9 @@ export class PdfConverter extends cdk.Construct {
 
     const meta = Object.entries(props.options || {}).map(([k, v]) => `--metadata=${k}:${v}`).join(' ');
 
-    new codebuild.Project(this, 'UpdateProject', {
+    const parameterName = props.personalAccessTokenParameterName || `/GitHubToken/${props.owner}`;
+
+    const project = new codebuild.Project(this, 'UpdateProject', {
       description: 'Convert MarkDown to PDF in a GitHub repository',
       source: new codebuild.GitHubSource({
         owner: props.owner,
@@ -74,7 +76,7 @@ export class PdfConverter extends cdk.Construct {
             METADATA: meta,
           },
           'parameter-store': {
-            ACCESS_TOKEN: props.personalAccessTokenParameterName || `/GitHub/${props.owner}`,
+            ACCESS_TOKEN: parameterName,
           },
         },
         phases: {
@@ -86,14 +88,20 @@ export class PdfConverter extends cdk.Construct {
           },
           build: {
             commands: [
-              'env',
-              'ls -al',
-              'pandoc --version',
-              'git --version',
+              'env',  // For debugging
+              'convert-all-markdowns',
             ],
           }
         },
       },
     });
+
+    project.addToRolePolicy(new iam.PolicyStatement()
+      .addActions('ssm:GetParameter', 'ssm:GetParameters')
+      .addResource(this.node.stack.formatArn({
+        service: 'ssm',
+        resource: 'parameter',
+        resourceName: parameterName.replace(/^\//, ''), // Remove leading slash
+      })));
   }
 }
