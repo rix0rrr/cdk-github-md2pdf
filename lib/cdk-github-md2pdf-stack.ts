@@ -8,11 +8,12 @@ export class CdkGithubMd2pdfStack extends cdk.Stack {
 
     const tokenParameterName = '/GitHubToken/rix0rrr';
 
-    new PdfConverter(this, 'Converter', {
-      owner: 'rix0rrr',
-      repository: 'rix0rrr.github.com',
+    new PdfConverter(this, 'PythonInDeKlas', {
+      owner: 'Felienne',
+      repository: 'Python_in_de_klas',
       commitUsername: 'PDFBot',
       commitEmail: 'pdfbot@felienne.com',
+      pushUser: 'rix0rrr',
       options: {
         "listings-disable-line-numbers": "true"
       }
