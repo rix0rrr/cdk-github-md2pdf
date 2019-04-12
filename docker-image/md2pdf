@@ -1,0 +1,39 @@
+#!/bin/bash
+# Convert a MarkDown file to a PDF
+set -eu
+
+scriptdir=$(cd $(dirname $0) && pwd)
+
+pandoc_options="\
+    --template=eisvogel \
+    --listings \
+    ${METADATA:-}"
+
+mkdir -p .tags
+
+while [[ "${1:-}" != "" ]]; do
+    tagfile=.tags/$(echo "$1"| tr -C "a-zA-Z0-9." "-")
+    # Combine options and file contents into md5hash
+    md5=$(cat <(echo $pandoc_options) "$1" | md5sum | cut -f1 -d' ')
+
+    if [[ ! -f $tagfile ]] || [[ "$md5" != "$(cat $tagfile)" ]]; then
+        echo "Converting $1" >&2
+        pdffile="${1/.md}.pdf"
+
+        # Remove error file in advance
+        rm -f "$1.error.txt"
+
+        # Run pandoc, move errors to error file on failure
+        pandoc \
+            $pandoc_options \
+            -s \
+            "$1" \
+            -o "$pdffile" > /tmp/errors.txt 2>&1 \
+        || mv /tmp/errors.txt "$1.error.txt"
+
+        echo "$pdffile"
+        echo "$md5" > "$tagfile"
+    fi
+
+    shift
+done
