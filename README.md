@@ -6,7 +6,7 @@ Convert MarkDown to PDF in a GitHub repository.
 
 ### GitHub Token
 
-Create a GitHub Personal Access Token, and import it into CodeBuild:
+Create a GitHub Personal Access Token with scopes **repo** and **admin:repo_hook**, and import it into CodeBuild. You need to be admin on the project you want to create this on:
 
 ```
 aws codebuild import-source-credentials --server-type GITHUB --auth-type PERSONAL_ACCESS_TOKEN --token <token_value>
