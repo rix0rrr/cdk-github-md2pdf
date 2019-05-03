@@ -3,18 +3,15 @@ set -eu
 
 branch=master
 
-if [[ "$CODEBUILD_WEBHOOK_TRIGGER" != "branch/$branch" ]]; then
+if [[ "${CODEBUILD_WEBHOOK_TRIGGER:-}" != "branch/$branch" ]] && [[ "${CODEBUILD_WEBHOOK_TRIGGER:-}" != "" ]]; then
   exit 0
 fi
 
 # Find all markdowns and invoke md2pdf on all of them
 find . -name \*.md -print0 | xargs -0 md2pdf
 
-# Are there changes? If not, done.
-git diff-index --quiet HEAD || exit 0
-
-# If so, commit everything and push
 git add -A .
-git commit -m "bot: generate PDF from updated MarkDowns"
+# May fail because of empty commit, if so that's fine.
+git commit -m "bot: generate PDF from updated MarkDowns" || exit 0
 git remote set-url --push origin https://$PUSH_USER:$ACCESS_TOKEN@github.com/$OWNER/$REPO.git
 git push origin HEAD:$branch

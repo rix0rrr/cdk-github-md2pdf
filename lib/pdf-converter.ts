@@ -50,7 +50,8 @@ export class PdfConverter extends cdk.Construct {
 
     const meta = Object.entries(props.options || {}).map(([k, v]) => `--metadata=${k}:${v}`).join(' ');
 
-    const parameterName = props.personalAccessTokenParameterName || `/GitHubToken/${props.pushUser}`;
+    const pushUser = props.pushUser || props.owner;
+    const parameterName = props.personalAccessTokenParameterName || `/GitHubToken/${pushUser}`;
 
     const project = new codebuild.Project(this, 'UpdateProject', {
       description: 'Convert MarkDown to PDF in a GitHub repository',
@@ -70,7 +71,7 @@ export class PdfConverter extends cdk.Construct {
         version: '0.2',
         env: {
           variables: {
-            PUSH_USER: props.pushUser || props.owner,
+            PUSH_USER: pushUser,
             OWNER: props.owner,
             REPO: props.repository,
             METADATA: meta,
