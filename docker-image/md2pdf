@@ -20,8 +20,8 @@ while [[ "${1:-}" != "" ]]; do
         echo "Converting $1" >&2
         pdffile="${1/.md}.pdf"
 
-        # Remove error file in advance
-        rm -f "$1.error.txt"
+        # Remove error and PDF file in advance
+        rm -f "$1.error.txt" "$pdffile"
 
         # Run pandoc, move errors to error file on failure
         pandoc \

@@ -1,0 +1,12 @@
+#!/bin/bash
+set -eu
+(cd ../docker-image && docker build -t md2pdf .)
+
+root=$PWD
+
+exec docker run --net=host \
+    --rm \
+    -v $root:$root -w $PWD \
+    -e TEST=true \
+    --entrypoint convert-all-markdowns \
+    md2pdf
