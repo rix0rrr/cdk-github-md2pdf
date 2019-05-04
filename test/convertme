@@ -8,5 +8,6 @@ exec docker run --net=host \
     --rm \
     -v $root:$root -w $PWD \
     -e TEST=true \
+    -e METADATA="--metadata=listings-no-page-break:true" \
     --entrypoint convert-all-markdowns \
     md2pdf

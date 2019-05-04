@@ -14,7 +14,8 @@ export class CdkGithubMd2pdfStack extends cdk.Stack {
       commitUsername: 'PDFBot',
       commitEmail: 'pdfbot@felienne.com',
       options: {
-        "listings-disable-line-numbers": "true"
+        "listings-disable-line-numbers": "true",
+        "listings-no-page-break": "true",
       }
     });
   }
